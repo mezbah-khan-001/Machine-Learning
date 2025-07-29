@@ -4,9 +4,11 @@
 #  Lets do this with proper codes 
 import numpy as np
 import pandas as pd
-import matplotlib.pyplot as plt
-import seaborn as sns
-import sklearn as skn
+# Commented out unused heavy libraries (matplotlib, seaborn, sklearn) to trim
+# dependency footprint. Uncomment only if needed for plotting or ML tasks.
+# import matplotlib.pyplot as plt
+# import seaborn as sns
+# import sklearn as skn
 
 class FirstCls:
     hello01 = "This is a mini project by Mezbah Khan."
