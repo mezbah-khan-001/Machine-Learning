@@ -4,9 +4,14 @@ import numpy as np
 import pandas as pd 
 import seaborn as sns 
 import matplotlib.pyplot as plt 
-import os , functools , time 
+# Unused imports removed to speed up import time and shrink dependencies
 from pathlib import Path
-from icecream import ic 
+# Optional pretty printer, falls back to built-in print if not available
+try:
+    from icecream import ic  # type: ignore
+except ImportError:  # pragma: no cover
+    def ic(*args, **kwargs):
+        print(*args)
 
     # lets load the dataset ---> 
 data_path = Path('IMCD_DATA.csv')

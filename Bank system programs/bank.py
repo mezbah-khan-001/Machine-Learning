@@ -1,9 +1,12 @@
 #  hello world this mezbah kkhan from backend developer
-#  lets create  the project using numpy labs( numpy , pandas , seaborn ) 
-#  Lets do this with proper codes 
+#  This version removes heavy third-party dependencies (pandas, numpy)
+#  in favour of Python standard-library modules for faster start-up and
+#  a dramatically smaller deployment footprint.
 
-import numpy as np
-import pandas as pd
+import csv
+import os
+import random
+import string
 
 class BankSystem:
     """Base class for bank account management."""
@@ -17,27 +20,29 @@ class BankSystem:
     
     def generate_account_number(self):
         """Generate a unique 10-digit account number."""
-        return np.random.randint(1000000000, 9999999999)
+        return random.randint(1_000_000_000, 9_999_999_999)
     
     def save_to_file(self):
-        """Save user details to a CSV file."""
-        data = pd.DataFrame([[self.name, self.age, self.salary, self.account_number]],
-                            columns=["Name", "Age", "Salary", "Account Number"])
-        try:
-            existing_data = pd.read_csv(self.data_file)
-            data = pd.concat([existing_data, data], ignore_index=True)
-        except FileNotFoundError:
-            pass
-        data.to_csv(self.data_file, index=False)
+        """Append user details to a CSV file (header written once)."""
+        file_exists = os.path.isfile(self.data_file)
+        with open(self.data_file, "a", newline="") as f:
+            writer = csv.writer(f)
+            # Write header exactly once (when creating the file)
+            if not file_exists:
+                writer.writerow(["Name", "Age", "Salary", "Account Number"])
+            writer.writerow([self.name, self.age, self.salary, self.account_number])
     
     @classmethod
     def view_all_accounts(cls):
         """Read and display all stored account details."""
-        try:
-            data = pd.read_csv(cls.data_file)
-            print(data)
-        except FileNotFoundError:
+        if not os.path.isfile(cls.data_file):
             print("No account data found.")
+            return
+
+        with open(cls.data_file, newline="") as f:
+            reader = csv.reader(f)
+            for row in reader:
+                print(" | ".join(row))
 
 
 class HumanoidAccount(BankSystem):
@@ -55,9 +60,9 @@ class AIAccount(BankSystem):
     """Handles AI-generated bank accounts with random passwords."""
     
     def __init__(self):
-        name = f"AI_User_{np.random.randint(1000, 9999)}"
-        age = np.random.randint(18, 60)
-        salary = np.random.randint(20000, 150000)
+        name = f"AI_User_{random.randint(1000, 9999)}"
+        age = random.randint(18, 60)
+        salary = random.randint(20_000, 150_000)
         password = self.generate_password()
         super().__init__(name, age, salary)
         self.password = password
@@ -65,7 +70,8 @@ class AIAccount(BankSystem):
     
     def generate_password(self):
         """Generate a secure random password."""
-        return ''.join(np.random.choice(list("ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789!@#$%^&*"), 12))
+        chars = string.ascii_letters + string.digits + "!@#$%^&*"
+        return ''.join(random.choices(chars, k=12))
     
     def display_details(self):
         return f"AI Account Created: {self.name}, Age: {self.age}, Salary: {self.salary}, Account: {self.account_number}"
